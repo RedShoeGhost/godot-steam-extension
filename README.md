@@ -5,7 +5,7 @@ Godot Steam integration using GDExtension
 This is a Work In Progress.
 
 ## Building this plugin
-Before you can build this plugin please setup the [scons buildsystem]: https://docs.godotengine.org/en/stable/development/compiling/index.html.
+Before you can build this plugin please setup the [scons buildsystem](https://docs.godotengine.org/en/stable/development/compiling/index.html).
 
 Make sure that when you clone this repository you initialise the submodules recursively.
 
