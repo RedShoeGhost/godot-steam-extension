@@ -1,5 +1,5 @@
 /*************************************************************************/
-/*  example.h                                                            */
+/*  steam.cpp                                                          */
 /*************************************************************************/
 /*                       This file is part of:                           */
 /*                           GODOT ENGINE                                */
@@ -28,85 +28,46 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                */
 /*************************************************************************/
 
-#ifndef EXAMPLE_CLASS_H
-#define EXAMPLE_CLASS_H
+#include "steam.h"
 
-// We don't need windows.h in this plugin but many others do and it throws up on itself all the time
-// So best to include it and make sure CI warns us when we use something Microsoft took for their own goals....
-#ifdef WIN32
-#include <windows.h>
-#endif
+#include <godot_cpp/core/class_db.hpp>
 
-#include <godot_cpp/classes/control.hpp>
 #include <godot_cpp/classes/global_constants.hpp>
-#include <godot_cpp/classes/viewport.hpp>
-
-#include <godot_cpp/core/binder_common.hpp>
+#include <godot_cpp/classes/label.hpp>
+#include <godot_cpp/variant/utility_functions.hpp>
 
 using namespace godot;
 
-class ExampleRef : public RefCounted {
-	GDCLASS(ExampleRef, RefCounted);
+SteamRef::SteamRef() {
+	//UtilityFunctions::print("SteamRef created.");
+}
 
-protected:
-	static void _bind_methods() {}
+SteamRef::~SteamRef() {
+	//UtilityFunctions::print("SteamRef destroyed.");
+}
 
-public:
-	ExampleRef();
-	~ExampleRef();
-};
+void Steam::_bind_methods() {
+	ClassDB::bind_static_method("Steam", D_METHOD("init"), &Steam::init);\
+	ClassDB::bind_static_method("Steam", D_METHOD("get_persona_name"), &Steam::get_persona_name);
+}
 
-class Example : public Control {
-	GDCLASS(Example, Control);
+Steam::Steam() {
+	//UtilityFunctions::print("Constructor.");
+}
 
-protected:
-	static void _bind_methods();
+Steam::~Steam() {
+	//UtilityFunctions::print("Destructor.");
+}
 
-private:
-	Vector2 custom_position;
+// Methods.
+bool Steam::init() {
+	return SteamAPI_Init();
+}
 
-public:
-	// Constants.
-	enum Constants {
-		FIRST,
-		ANSWER_TO_EVERYTHING = 42,
-	};
-
-	enum {
-		CONSTANT_WITHOUT_ENUM = 314,
-	};
-
-	Example();
-	~Example();
-
-	// Functions.
-	void simple_func();
-	void simple_const_func() const;
-	String return_something(const String &base);
-	Viewport *return_something_const() const;
-	ExampleRef *return_extended_ref() const;
-	Ref<ExampleRef> extended_ref_checks(Ref<ExampleRef> p_ref) const;
-	Variant varargs_func(const Variant **args, GDNativeInt arg_count, GDNativeCallError &error);
-	int varargs_func_nv(const Variant **args, GDNativeInt arg_count, GDNativeCallError &error);
-	void varargs_func_void(const Variant **args, GDNativeInt arg_count, GDNativeCallError &error);
-	void emit_custom_signal(const String &name, int value);
-	int def_args(int p_a = 100, int p_b = 200);
-
-	Array test_array() const;
-	Dictionary test_dictionary() const;
-
-	// Property.
-	void set_custom_position(const Vector2 &pos);
-	Vector2 get_custom_position() const;
-
-	// Static method.
-	static int test_static(int p_a, int p_b);
-	static void test_static2();
-
-	// Virtual function override (no need to bind manually).
-	virtual bool _has_point(const Vector2 &point) const override;
-};
-
-VARIANT_ENUM_CAST(Example, Constants);
-
-#endif // ! EXAMPLE_CLASS_H
+//! Get the user's Steam username.
+String Steam::get_persona_name(){
+	if(SteamFriends() == NULL){
+		return "";
+	}
+	return String::utf8(SteamFriends()->GetPersonaName());
+}

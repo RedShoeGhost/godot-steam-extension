@@ -1,5 +1,5 @@
 /*************************************************************************/
-/*  register_types.h                                                     */
+/*  steam.h                                                            */
 /*************************************************************************/
 /*                       This file is part of:                           */
 /*                           GODOT ENGINE                                */
@@ -28,13 +28,48 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                */
 /*************************************************************************/
 
-#ifndef STEAM_REGISTER_TYPES_H
-#define STEAM_REGISTER_TYPES_H
+#ifndef STEAM_CLASS_H
+#define STEAM_CLASS_H
 
-#include <godot_cpp/core/class_db.hpp>
+// We don't need windows.h in this plugin but many others do and it throws up on itself all the time
+// So best to include it and make sure CI warns us when we use something Microsoft took for their own goals....
+#ifdef WIN32
+#include <windows.h>
+#endif
+
+#include <godot_cpp/classes/control.hpp>
+#include <godot_cpp/classes/global_constants.hpp>
+#include <godot_cpp/classes/viewport.hpp>
+
+#include <godot_cpp/core/binder_common.hpp>
+
+#include <steam/steam_api.h>
+
 using namespace godot;
 
-void initialize_steam_module(ModuleInitializationLevel p_level);
-void uninitialize_steam_module(ModuleInitializationLevel p_level);
+class SteamRef : public RefCounted {
+	GDCLASS(SteamRef, RefCounted);
 
-#endif // ! STEAM_REGISTER_TYPES_H
+protected:
+	static void _bind_methods() {}
+
+public:
+	SteamRef();
+	~SteamRef();
+};
+
+class Steam : public Control {
+	GDCLASS(Steam, Control);
+
+protected:
+	static void _bind_methods();
+
+public:
+	Steam();
+	~Steam();
+	
+	static bool init();
+	static String get_persona_name();
+};
+
+#endif // ! STEAM_CLASS_H

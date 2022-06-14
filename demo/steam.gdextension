@@ -1,0 +1,16 @@
+[configuration]
+
+entry_symbol = "steam_library_init"
+
+[libraries]
+
+macos.debug = "bin/libsteam.osx.debug.framework"
+macos.release = "bin/libsteam.osx.release.framework"
+windows.debug.x86_64 = "bin/libsteam.windows.debug.x86_64.dll"
+windows.release.x86_64 = "bin/libsteam.windows.release.x86_64.dll"
+linux.debug.x86_64 = "bin/libsteam.linux.debug.x86_64.so"
+linux.release.x86_64 = "bin/libsteam.linux.release.x86_64.so"
+linux.debug.arm64 = "bin/libsteam.linux.debug.arm64.so"
+linux.release.arm64 = "bin/libsteam.linux.release.arm64.so"
+linux.debug.rv64 = "bin/libsteam.linux.debug.rv64.so"
+linux.release.rv64 = "bin/libsteam.linux.release.rv64.so"

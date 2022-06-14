@@ -2,7 +2,7 @@
 import os
 import sys
 
-env = SConscript("../SConstruct")
+env = SConscript("godot-cpp/SConstruct")
 
 # For the reference:
 # - CCFLAGS are compilation flags shared between C and C++
@@ -14,18 +14,24 @@ env = SConscript("../SConstruct")
 
 # tweak this if you want to use different folders, or more folders, to store your source code in.
 env.Append(CPPPATH=["src/"])
+
+# SteamAPI (only for windows)
+env.Append(CPPPATH=["steam-sdk/public/"])
+env.Append(LIBPATH=["steam-sdk/redistributable_bin/win64/"])
+env.Append(LIBS=["steam_api64"])
+
 sources = Glob("src/*.cpp")
 
 if env["platform"] == "osx":
     library = env.SharedLibrary(
-        "demo/bin/libgdexample.{}.{}.framework/libgdexample.{}.{}".format(
+        "demo/bin/libsteam.{}.{}.framework/libsteam.{}.{}".format(
             env["platform"], env["target"], env["platform"], env["target"]
         ),
         source=sources,
     )
 else:
     library = env.SharedLibrary(
-        "demo/bin/libgdexample.{}.{}.{}{}".format(
+        "demo/bin/libsteam.{}.{}.{}{}".format(
             env["platform"], env["target"], env["arch_suffix"], env["SHLIBSUFFIX"]
         ),
         source=sources,

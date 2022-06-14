@@ -24,6 +24,24 @@ mono_crash.*.json
 .directory
 *~
 
+# Binaries
+*.o
+*.os
+*.so
+*.obj
+*.bc
+*.pyc
+*.dblite
+*.pdb
+*.lib
+bin
+*.config
+*.creator
+*.creator.user
+*.files
+*.includes
+*.idb
+
 # Steam SDK
 steam-sdk/glmgr/
 steam-sdk/public/
