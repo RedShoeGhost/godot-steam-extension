@@ -61,6 +61,13 @@ public:
 class Steam : public Control {
 	GDCLASS(Steam, Control);
 
+private:
+	// Lobby
+	CCallResult<Steam, LobbyCreated_t> callResultCreateLobby;
+	void lobby_created(LobbyCreated_t *call_data, bool io_failure);
+	CCallResult<Steam, LobbyMatchList_t> callResultLobbyList;
+	void lobby_match_list(LobbyMatchList_t *call_data, bool io_failure);
+
 protected:
 	static void _bind_methods();
 
@@ -68,8 +75,22 @@ public:
 	Steam();
 	~Steam();
 	
-	static bool init();
-	static String get_persona_name();
+	// System
+	bool init();
+	void run_callbacks();
+
+	// User
+	String get_persona_name();
+
+	// Lobby
+	void create_lobby(int lobby_type, int max_members);
+	bool set_lobby_data(uint64_t steam_lobby_id, const String& key, const String& value);
+	void join_lobby(uint64_t steam_lobby_id);
+	void leave_lobby(uint64_t steam_lobby_id);
+	void request_lobby_list();
+	void add_request_lobby_list_string_filter(const String& key_to_match, const String& value_to_match, int comparison_type);
+	void add_request_lobby_list_distance_filter(int distance_filter);
+	
 };
 
 #endif // ! STEAM_CLASS_H
