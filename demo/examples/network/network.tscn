@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://bijrk7qs3vx43"]
+
+[ext_resource type="Script" path="res://examples/network/network.gd" id="1_br5u1"]
+
+[node name="Steam" type="Steam"]
+script = ExtResource( "1_br5u1" )

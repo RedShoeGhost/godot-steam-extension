@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="Steam GDExtension Test Project"
-run/main_scene="res://main.tscn"
+run/main_scene="res://examples/network/network.tscn"
 config/features=PackedStringArray("4.0")
 config/icon="res://icon.png"
 
