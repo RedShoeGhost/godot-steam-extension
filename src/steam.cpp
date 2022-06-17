@@ -65,7 +65,7 @@ void Steam::_bind_methods() {
 	ADD_SIGNAL(MethodInfo("lobby_match_list", PropertyInfo(Variant::ARRAY, "lobbies")));
 	ClassDB::bind_method(D_METHOD("add_request_lobby_list_string_filter", "key_to_match", "value_to_match", "comparison_type"), &Steam::add_request_lobby_list_string_filter);
 	ClassDB::bind_method(D_METHOD("add_request_lobby_list_distance_filter", "distance_filter"), &Steam::add_request_lobby_list_distance_filter);
-	ADD_SIGNAL(MethodInfo("lobby_data_update"));
+	ADD_SIGNAL(MethodInfo("lobby_data_update", PropertyInfo(Variant::INT, "success"), PropertyInfo(Variant::INT, "lobby_id"), PropertyInfo(Variant::INT, "member_id")));
 }
 
 Steam::Steam() :
