@@ -3,11 +3,13 @@ extends Steam
 const UNIQUE_KEY = "demo1234"
 const UNIQUE_VALUE = "c21hbGwxMjM0"
 
+
 func _ready():
 	var init = init()
 	if init:
-		lobby_created.connect(_on_lobby_created)
 		lobby_match_list.connect(_on_lobby_match_list)
+		lobby_created.connect(_on_lobby_created)
+		lobby_joined.connect(_on_lobby_joined)
 		
 		add_request_lobby_list_distance_filter(3)
 		add_request_lobby_list_string_filter(UNIQUE_KEY, UNIQUE_VALUE, 0)
@@ -15,11 +17,10 @@ func _ready():
 	else:
 		print("Steam is not running!")
 
+
 func _process(_delta):
 	run_callbacks()
 
-func _on_lobby_created(result: int, lobby_id: int):
-	set_lobby_data(lobby_id, UNIQUE_KEY, UNIQUE_VALUE)
 
 func _on_lobby_match_list(lobbies: Array):
 	if lobbies.size() > 0:
@@ -27,3 +28,10 @@ func _on_lobby_match_list(lobbies: Array):
 	else:
 		create_lobby(2, 4)
 
+
+func _on_lobby_created(result: int, lobby_id: int):
+	set_lobby_data(lobby_id, UNIQUE_KEY, UNIQUE_VALUE)
+
+
+func _on_lobby_joined(lobby: int, permissions: int, locked: bool, response: int):
+	pass

@@ -59,6 +59,7 @@ void Steam::_bind_methods() {
 	ADD_SIGNAL(MethodInfo("lobby_created", PropertyInfo(Variant::INT, "result"), PropertyInfo(Variant::INT, "lobby_id")));
 	ClassDB::bind_method(D_METHOD("set_lobby_data", "steam_lobby_id", "key", "value"), &Steam::set_lobby_data);
 	ClassDB::bind_method(D_METHOD("join_lobby", "steam_lobby_id"), &Steam::join_lobby);
+	ADD_SIGNAL(MethodInfo("lobby_joined", PropertyInfo(Variant::INT, "lobby"), PropertyInfo(Variant::INT, "permissions"), PropertyInfo(Variant::BOOL, "locked"), PropertyInfo(Variant::INT, "response")));
 	ClassDB::bind_method(D_METHOD("leave_lobby", "steam_lobby_id"), &Steam::leave_lobby);
 	ClassDB::bind_method(D_METHOD("request_lobby_list"), &Steam::request_lobby_list);
 	ADD_SIGNAL(MethodInfo("lobby_match_list", PropertyInfo(Variant::ARRAY, "lobbies")));
@@ -94,7 +95,7 @@ String Steam::get_persona_name(){
 // Lobby
 void Steam::create_lobby(int lobby_type, int max_members){
 	if(SteamMatchmaking() != NULL){
-		SteamAPICall_t api_call = SteamMatchmaking()->CreateLobby(k_ELobbyTypePublic, max_members);
+		SteamAPICall_t api_call = SteamMatchmaking()->CreateLobby((ELobbyType)lobby_type, max_members);
 		callResultCreateLobby.Set(api_call, this, &Steam::lobby_created);
 	}
 }
@@ -121,8 +122,17 @@ bool Steam::set_lobby_data(uint64_t steam_lobby_id, const String& key, const Str
 void Steam::join_lobby(uint64_t steam_lobby_id){
 	if(SteamMatchmaking() != NULL){
 		CSteamID lobby_id = (uint64)steam_lobby_id;
-		SteamMatchmaking()->JoinLobby(lobby_id);
+		SteamAPICall_t api_call = SteamMatchmaking()->JoinLobby(lobby_id);
+		callResultLobbyJoined.Set(api_call, this, &Steam::lobby_joined);
 	}
+}
+void Steam::lobby_joined(LobbyEnter_t* lobbyData, bool io_failure){
+	CSteamID steam_lobby_id = lobbyData->m_ulSteamIDLobby;
+	uint64_t lobby_id = steam_lobby_id.ConvertToUint64();
+	uint32_t permissions = lobbyData->m_rgfChatPermissions;
+	bool locked = lobbyData->m_bLocked;
+	uint32_t response = lobbyData->m_EChatRoomEnterResponse;
+	emit_signal("lobby_joined", lobby_id, permissions, locked, response);
 }
 
 void Steam::leave_lobby(uint64_t steam_lobby_id){
