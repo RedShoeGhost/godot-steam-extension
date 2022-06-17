@@ -65,9 +65,15 @@ void Steam::_bind_methods() {
 	ADD_SIGNAL(MethodInfo("lobby_match_list", PropertyInfo(Variant::ARRAY, "lobbies")));
 	ClassDB::bind_method(D_METHOD("add_request_lobby_list_string_filter", "key_to_match", "value_to_match", "comparison_type"), &Steam::add_request_lobby_list_string_filter);
 	ClassDB::bind_method(D_METHOD("add_request_lobby_list_distance_filter", "distance_filter"), &Steam::add_request_lobby_list_distance_filter);
+	ADD_SIGNAL(MethodInfo("lobby_data_update"));
 }
 
-Steam::Steam() {
+Steam::Steam() :
+	callbackLobbyMatchList(this, &Steam::lobby_match_list),
+	callbackLobbyCreated(this, &Steam::lobby_created),
+	callbackLobbyJoined(this, &Steam::lobby_joined),
+	callbackLobbyDataUpdate(this, &Steam::lobby_data_update)
+{
 	//UtilityFunctions::print("Constructor.");
 }
 
@@ -95,20 +101,14 @@ String Steam::get_persona_name(){
 // Lobby
 void Steam::create_lobby(int lobby_type, int max_members){
 	if(SteamMatchmaking() != NULL){
-		SteamAPICall_t api_call = SteamMatchmaking()->CreateLobby((ELobbyType)lobby_type, max_members);
-		callResultCreateLobby.Set(api_call, this, &Steam::lobby_created);
+		SteamMatchmaking()->CreateLobby((ELobbyType)lobby_type, max_members);
 	}
 }
-void Steam::lobby_created(LobbyCreated_t *lobbyData, bool io_failure){
-	if(io_failure){
-		UtilityFunctions::printerr("lobby_created");
-	}
-	else{
-		int result = lobbyData->m_eResult;
-		CSteamID lobby_id = lobbyData->m_ulSteamIDLobby;
-		uint64_t lobby = lobby_id.ConvertToUint64();
-		emit_signal("lobby_created", result, lobby);
-	}
+void Steam::lobby_created(LobbyCreated_t *lobbyData){
+	int result = lobbyData->m_eResult;
+	CSteamID lobby_id = lobbyData->m_ulSteamIDLobby;
+	uint64_t lobby = lobby_id.ConvertToUint64();
+	emit_signal("lobby_created", result, lobby);
 }
 
 bool Steam::set_lobby_data(uint64_t steam_lobby_id, const String& key, const String& value){
@@ -122,11 +122,10 @@ bool Steam::set_lobby_data(uint64_t steam_lobby_id, const String& key, const Str
 void Steam::join_lobby(uint64_t steam_lobby_id){
 	if(SteamMatchmaking() != NULL){
 		CSteamID lobby_id = (uint64)steam_lobby_id;
-		SteamAPICall_t api_call = SteamMatchmaking()->JoinLobby(lobby_id);
-		callResultLobbyJoined.Set(api_call, this, &Steam::lobby_joined);
+		SteamMatchmaking()->JoinLobby(lobby_id);
 	}
 }
-void Steam::lobby_joined(LobbyEnter_t* lobbyData, bool io_failure){
+void Steam::lobby_joined(LobbyEnter_t* lobbyData){
 	CSteamID steam_lobby_id = lobbyData->m_ulSteamIDLobby;
 	uint64_t lobby_id = steam_lobby_id.ConvertToUint64();
 	uint32_t permissions = lobbyData->m_rgfChatPermissions;
@@ -144,25 +143,19 @@ void Steam::leave_lobby(uint64_t steam_lobby_id){
 
 void Steam::request_lobby_list(){
 	if(SteamMatchmaking() != NULL){
-		SteamAPICall_t api_call = SteamMatchmaking()->RequestLobbyList();
-		callResultLobbyList.Set(api_call, this, &Steam::lobby_match_list);
+		SteamMatchmaking()->RequestLobbyList();
 	}
 }
 
-void Steam::lobby_match_list(LobbyMatchList_t *call_data, bool io_failure){
-	if(io_failure){
-		UtilityFunctions::printerr("lobby_match_list");
+void Steam::lobby_match_list(LobbyMatchList_t *call_data){
+	int lobby_count = call_data->m_nLobbiesMatching;
+	Array lobbies;
+	for(int i = 0; i < lobby_count; i++){
+		CSteamID lobby_id = SteamMatchmaking()->GetLobbyByIndex(i);
+		uint64_t lobby = lobby_id.ConvertToUint64();
+		lobbies.append(lobby);
 	}
-	else{
-		int lobby_count = call_data->m_nLobbiesMatching;
-		Array lobbies;
-		for(int i = 0; i < lobby_count; i++){
-			CSteamID lobby_id = SteamMatchmaking()->GetLobbyByIndex(i);
-			uint64_t lobby = lobby_id.ConvertToUint64();
-			lobbies.append(lobby);
-		}
-		emit_signal("lobby_match_list", lobbies);
-	}
+	emit_signal("lobby_match_list", lobbies);
 }
 
 void Steam::add_request_lobby_list_string_filter(const String& key_to_match, const String& value_to_match, int comparison_type){
@@ -175,4 +168,11 @@ void Steam::add_request_lobby_list_distance_filter(int distance_filter){
 	if(SteamMatchmaking() != NULL){
 		SteamMatchmaking()->AddRequestLobbyListDistanceFilter((ELobbyDistanceFilter)distance_filter);
 	}
+}
+
+void Steam::lobby_data_update(LobbyDataUpdate_t* call_data){
+	uint64_t member_id = call_data->m_ulSteamIDMember;
+	uint64_t lobby_id = call_data->m_ulSteamIDLobby;
+	uint8 success = call_data->m_bSuccess;
+	emit_signal("lobby_data_update", success, lobby_id, member_id);
 }

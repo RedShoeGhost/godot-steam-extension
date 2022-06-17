@@ -63,14 +63,10 @@ class Steam : public Control {
 
 private:
 	// Lobby
-	CCallResult<Steam, LobbyCreated_t> callResultCreateLobby;
-	void lobby_created(LobbyCreated_t *call_data, bool io_failure);
-
-	CCallResult<Steam, LobbyMatchList_t> callResultLobbyList;
-	void lobby_match_list(LobbyMatchList_t *call_data, bool io_failure);
-
-	CCallResult<Steam, LobbyEnter_t> callResultLobbyJoined;
-	void lobby_joined(LobbyEnter_t *call_data, bool io_failure);
+	STEAM_CALLBACK(Steam, lobby_match_list, LobbyMatchList_t, callbackLobbyMatchList);
+	STEAM_CALLBACK(Steam, lobby_created, LobbyCreated_t, callbackLobbyCreated);
+	STEAM_CALLBACK(Steam, lobby_joined, LobbyEnter_t, callbackLobbyJoined);
+	STEAM_CALLBACK(Steam, lobby_data_update, LobbyDataUpdate_t, callbackLobbyDataUpdate);
 
 protected:
 	static void _bind_methods();
