@@ -67,6 +67,14 @@ private:
 	STEAM_CALLBACK(Steam, lobby_created, LobbyCreated_t, callbackLobbyCreated);
 	STEAM_CALLBACK(Steam, lobby_joined, LobbyEnter_t, callbackLobbyJoined);
 	STEAM_CALLBACK(Steam, lobby_data_update, LobbyDataUpdate_t, callbackLobbyDataUpdate);
+	STEAM_CALLBACK(Steam, lobby_chat_update, LobbyChatUpdate_t, callbackLobbyChatUpdate);
+	STEAM_CALLBACK(Steam, lobby_chat_message, LobbyChatMsg_t, callbackLobbyMessage);
+	STEAM_CALLBACK(Steam, lobby_invite, LobbyInvite_t, callbackLobbyInvite);
+	STEAM_CALLBACK(Steam, lobby_join_requested, GameLobbyJoinRequested_t, callbackLobbyJoinRequested);
+
+	// P2P
+	STEAM_CALLBACK(Steam, p2p_session_request, P2PSessionRequest_t, callbackP2PSessionRequest);
+	STEAM_CALLBACK(Steam, p2p_session_connect_fail, P2PSessionConnectFail_t, callbackP2PSessionConnectFail);
 
 protected:
 	static void _bind_methods();
@@ -74,13 +82,18 @@ protected:
 public:
 	Steam();
 	~Steam();
+
+	// Internal
+	CSteamID createSteamID(uint64_t steam_id, int account_type = -1);
 	
 	// System
 	bool init();
 	void run_callbacks();
 
 	// User
+	uint64_t get_steam_id();
 	String get_persona_name();
+	String get_friend_persona_name(uint64_t steam_id);
 
 	// Lobby
 	void create_lobby(int lobby_type, int max_members);
@@ -90,6 +103,18 @@ public:
 	void request_lobby_list();
 	void add_request_lobby_list_string_filter(const String& key_to_match, const String& value_to_match, int comparison_type);
 	void add_request_lobby_list_distance_filter(int distance_filter);
+	uint64_t get_lobby_owner(uint64_t steam_lobby_id);
+	int get_num_lobby_members(uint64_t steam_lobby_id);
+	uint64_t get_lobby_member_by_index(uint64_t steam_lobby_id, int member);
+	bool send_lobby_chat_message(uint64_t steam_lobby_id, const String& message_body);
+
+	// P2P
+	bool accept_p2p_session_with_user(uint64_t steam_id_remote);
+	bool allow_p2p_packet_relay(bool allow);
+	bool close_p2p_session_with_user(uint64_t steam_id_remote);
+	uint32_t get_available_p2p_packet_size(int channel = 0);
+	Dictionary read_p2p_packet(uint32_t packet, int channel = 0);
+	bool send_p2p_packet(uint64_t steam_id_remote, const PackedByteArray data, int send_type, int channel = 0);
 	
 };
 
