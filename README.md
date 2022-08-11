@@ -22,3 +22,9 @@ scons target=debug
 ```
 
 > It is important to build debug builds as the editor requires debug builds to run.
+
+To update the submodle run
+
+```
+git submodule update --remote
+```
