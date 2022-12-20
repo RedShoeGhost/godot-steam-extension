@@ -12,13 +12,13 @@ Make sure that when you clone this repository you initialise the submodules recu
 Compile `godot-cpp` as per usual:
 ```
 cd godot-cpp
-scons target=debug generate_bindings=yes
+scons target=template_debug generate_bindings=yes
 cd ..
 ```
 
 After this compile the plugin:
 ```
-scons target=debug
+scons target=template_debug
 ```
 
 > It is important to build debug builds as the editor requires debug builds to run.

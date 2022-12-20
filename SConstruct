@@ -22,7 +22,7 @@ env.Append(LIBS=["steam_api64"])
 
 sources = Glob("src/*.cpp")
 
-if env["platform"] == "osx":
+if env["platform"] == "macos":
     library = env.SharedLibrary(
         "demo/bin/libsteam.{}.{}.framework/libsteam.{}.{}".format(
             env["platform"], env["target"], env["platform"], env["target"]
@@ -31,9 +31,7 @@ if env["platform"] == "osx":
     )
 else:
     library = env.SharedLibrary(
-        "demo/bin/libsteam.{}.{}.{}{}".format(
-            env["platform"], env["target"], env["arch_suffix"], env["SHLIBSUFFIX"]
-        ),
+        "demo/bin/libsteam{}{}".format(env["suffix"], env["SHLIBSUFFIX"]),
         source=sources,
     )
 
